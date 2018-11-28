@@ -11,6 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Create by: Jackson
  */
 public class Task extends Thread {
+
     @Override
     public void run() {
         try{
@@ -30,10 +31,12 @@ public class Task extends Thread {
                 String input = clipboardComp.getClipboardString();
                 if (StringUtils.isEmpty(input))continue;
                 input = input.trim();
-                L.d(input);
-                String translate = translate(map,input);
-                L.d(translate);
-                clipboardComp.setClipboardString(translate);
+                if(ChineseUtil.isChinese(input) || input.contains("（")){
+                    L.d(input);
+                    String translate = translate(map,input);
+                    L.d(translate);
+                    clipboardComp.setClipboardString(translate);
+                }
                 //ctrlV();
             }
         }catch (Exception e){
@@ -67,7 +70,7 @@ public class Task extends Thread {
         String[] split = input.split("；");
         String fanyi="";
         for (String s : split) {
-            if(!ChineseUtil.isChinese(s))continue;
+            s = s.trim();
             fanyi = fanyi+";"+get(map,s);
         }
         if(fanyi.length()>1)

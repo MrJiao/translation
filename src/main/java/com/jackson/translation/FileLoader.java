@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -45,14 +44,19 @@ public class FileLoader {
     private void loadString2(File file, TreeMap<String, String> treeMap) throws IOException {
         List<String> strings = FileUtils.readLines(file, "gbk");
         for (String string : strings) {
+            string = string.replaceAll("\"","")
+                    .replaceAll("\\(","（")
+                    .replaceAll("\\)","）");
             String[] split = string.split(",");
             String word = "";
             if(split.length<1)continue;
             for(int i=0;i<split.length-1;i++){
-                word = word+","+split[i].replaceAll("\"","").trim();
+                word = word+","+split[i].trim();
             }
             try {
-                treeMap.put(split[split.length-1],word.substring(1));
+                String chinese = split[split.length - 1].replaceAll(";", "")
+                        .replaceAll("；", "").trim();
+                treeMap.put(chinese,word.substring(1));
             }catch (Exception e){
                 L.d(string);
                 e.printStackTrace();
