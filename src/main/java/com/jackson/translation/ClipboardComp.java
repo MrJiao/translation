@@ -6,6 +6,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 
+import static com.jackson.translation.Config.isDebug;
+
 /**
  * Create by: Jackson
  */
@@ -28,20 +30,28 @@ public class ClipboardComp {
      * 从剪贴板中获取文本（粘贴）
      */
     public String getClipboardString() {
-        // 获取剪贴板中的内容
-        Transferable trans = clipboard.getContents(null);
-        if (trans != null) {
-            // 判断剪贴板中的内容是否支持文本
-            if (trans.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                try {
-                    // 获取剪贴板中的文本内容
-                    String text = (String) trans.getTransferData(DataFlavor.stringFlavor);
-                    return text;
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+        if(isDebug){
+            L.d("请输入");
+            return HappyInputUtil.getInput();
+        }else {
+            // 获取剪贴板中的内容
+            Transferable trans = clipboard.getContents(null);
+            if (trans != null) {
+                // 判断剪贴板中的内容是否支持文本
+                if (trans.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    try {
+                        // 获取剪贴板中的文本内容
+                        String text = (String) trans.getTransferData(DataFlavor.stringFlavor);
+                        return text;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+
+
         return null;
     }
 

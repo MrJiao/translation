@@ -7,36 +7,50 @@ import java.awt.event.KeyEvent;
 import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.jackson.translation.Config.isDebug;
+
 /**
  * Create by: Jackson
  */
 public class Task extends Thread {
 
+    public String preTranslate="";
+
     @Override
     public void run() {
         try{
+
             LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
             //注册热键
-            new HotKey().init(new MyKey(queue));
+            if(!isDebug){
+                new HotKey().init(new MyKey(queue));
+            }
+
             L.console("正在加载中...");
             FileLoader fileLoader = new FileLoader();
             TreeMap<String, String> map = fileLoader.load();
+            if(map==null || map.size()==0){
+                L.d("加载失败");
+                Thread.sleep(5000);
+                return;
+            }
             ClipboardComp clipboardComp = new ClipboardComp();
             L.d("启动成功");
             L.d("选中文本后按 ctrl + p 翻译  按 ctrl+q 关闭");
             while (true){
                 //睡
-                queue.take();
+                if(!isDebug)
+                    queue.take();
                 //ctrlX();
                 String input = clipboardComp.getClipboardString();
                 if (StringUtils.isEmpty(input))continue;
-                input = input.trim();
-                if(ChineseUtil.isChinese(input) || input.contains("（")){
-                    L.d(input);
-                    String translate = translate(map,input);
-                    L.d(translate);
-                    clipboardComp.setClipboardString(translate);
-                }
+                if(StringUtils.equals(preTranslate,input))continue;
+                input = input.replaceAll("（","\\(").replaceAll("）","\\)").trim();;
+                L.d(input);
+                String translate = translate(map,input);
+                L.d(translate);
+                clipboardComp.setClipboardString(translate);
+                preTranslate = translate;
                 //ctrlV();
             }
         }catch (Exception e){
