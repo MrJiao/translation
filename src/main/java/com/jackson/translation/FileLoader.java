@@ -75,22 +75,28 @@ public class FileLoader {
     private void loadString3(File file, TreeMap<String, String> treeMap) throws IOException {
         InputStream is = new FileInputStream(file);
         XSSFWorkbook excel = new XSSFWorkbook(is);
-
-        for (int numSheet = 0; numSheet < excel.getNumberOfSheets(); numSheet++) {
-            XSSFSheet sheet = excel.getSheetAt(numSheet);
-            int lastRowNum = sheet.getLastRowNum();
-            for (int index=0; index<lastRowNum;index++) {
-                XSSFRow row = sheet.getRow(index);
-                XSSFCell english = row.getCell(0);
-                XSSFCell chinese = row.getCell(1);
-                String englishValue = english.getStringCellValue();
-                englishValue = englishValue.replaceAll("（","\\(").replaceAll("）","\\)");
-                String chineseValue = chinese.getStringCellValue();
-                chineseValue = chineseValue.replaceAll("（","\\(").replaceAll("）","\\)");
-                treeMap.put( chineseValue,englishValue);
+        try {
+            for (int numSheet = 0; numSheet < excel.getNumberOfSheets(); numSheet++) {
+                XSSFSheet sheet = excel.getSheetAt(numSheet);
+                int lastRowNum = sheet.getLastRowNum();
+                for (int index=0; index<lastRowNum;index++) {
+                    XSSFRow row = sheet.getRow(index);
+                    if(row==null)continue;
+                    XSSFCell english = row.getCell(0);
+                    XSSFCell chinese = row.getCell(1);
+                    if(english==null || chinese==null) continue;
+                    String englishValue = english.getStringCellValue();
+                    englishValue = englishValue.replaceAll("（","\\(").replaceAll("）","\\)");
+                    String chineseValue = chinese.getStringCellValue();
+                    chineseValue = chineseValue.replaceAll("（","\\(").replaceAll("）","\\)");
+                    treeMap.put( chineseValue,englishValue);
+                }
             }
-
+        }catch (Exception e){
+            L.d(file.getName());
+            L.exception(e);
         }
+
     }
 
 

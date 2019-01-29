@@ -12,7 +12,7 @@ public class L {
     }
 
     public static void exception(Exception e) {
-
+        e.printStackTrace();
     }
 
     public static void console(String message){
