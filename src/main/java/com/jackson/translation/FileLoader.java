@@ -95,6 +95,8 @@ public class FileLoader {
         }catch (Exception e){
             L.d(file.getName());
             L.exception(e);
+        }finally {
+            is.close();
         }
 
     }
